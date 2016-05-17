@@ -53,6 +53,18 @@ func TestExtractParams(t *testing.T) {
 	}
 }
 
+func BenchmarkExtractParams(b *testing.B) {
+	var (
+		id        int
+		typeParam string
+		err       error
+	)
+	for i := 0; i < b.N; i++ {
+		id, typeParam, err = extractParams("/serve/foofoofoo/12345")
+	}
+	b.Logf("benchmark finished: id=%d, type=%s, err=%v", id, typeParam, err)
+}
+
 // makeErrorf adds a description parameter as the first output of Errorf.  This
 // is useful for table driven tests that include a description property in the
 // test table, to help clarify test output, while not having to remember to
