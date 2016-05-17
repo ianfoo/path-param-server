@@ -22,26 +22,29 @@ var (
 func handler(rw http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	log.Println("HTTP is being SERVED! Path:", path)
-	matches := pattern.FindStringSubmatch(path)
-	if len(matches) != 3 {
-		log.Println("bad path:", path)
-		rw.WriteHeader(http.StatusNotFound)
-		return
-	}
-	var (
-		id, err   = strconv.Atoi(matches[2])
-		typeParam = matches[1]
-	)
+	id, typeParam, err := extractParams(path)
 	if err != nil {
-		log.Println("bad ID:", err)
+		log.Println(err)
 		rw.WriteHeader(http.StatusBadRequest)
 		rw.Write([]byte(err.Error()))
 		return
 	}
-
 	log.Printf("id: %d, type: %s", id, typeParam)
-	rw.Header().Set("content-type", "application/json")
+	rw.Header().Set("content-type", "application/json; charset=utf8")
 	rw.Write([]byte(fmt.Sprintf(`{"id":%d,"type":%q}`, id, typeParam)))
+}
+
+func extractParams(path string) (id int, typeParam string, err error) {
+	matches := pattern.FindStringSubmatch(path)
+	if len(matches) != 3 {
+		return -1, "", fmt.Errorf("bad path: %s", path)
+	}
+	id, err = strconv.Atoi(matches[2])
+	typeParam = matches[1]
+	if err != nil {
+		return -1, "", fmt.Errorf("bad ID: %s", err)
+	}
+	return id, typeParam, err
 }
 
 func main() {
