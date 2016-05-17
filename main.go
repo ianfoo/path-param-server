@@ -1,3 +1,5 @@
+// path-param-server is a simple Go server that extracts parameters
+// from the URL path without using a third party library.
 package main
 
 import (
